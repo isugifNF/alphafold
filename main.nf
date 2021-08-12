@@ -25,6 +25,7 @@ process jackhammer_uniref {
     ${uniprot_ref}
     # Check if uniprot_ref also needs adjacent index files, will need to pass in the whole folder as a path
     # Should be able to auto specify tmp directory?
+    # Both jackhammer processes should be moved to template, it's the same command, different database
   """
 }
 
@@ -108,20 +109,22 @@ workflow {
   /* Step 1: split protein files into one each */
   protein_ch = channel.fromPath(params.fasta, checkIfExists:true) | splitFasta(by:1)
 
-  /* Link reference files here? */
-  uniprot_ch = channel.fromPath(params.uniprot, checkIfExists:true)
-  myg_cluster_ch = channel.fromPath(params.mgy_cluster, checkIfExists:true)
-  pdb_ch = channel.fromPath(params.pdb, checkIfExists:true)
-
+  /* Reference Genetic Databases: https://github.com/deepmind/alphafold#genetic-databases */
+  uniref_ch = channel.fromPath(params.uniref90_db, checkIfExists:true)
+  mgnify_ch = channel.fromPath(params.mgnify_db, checkIfExists:true)
+//  bfd_db
+//  uniclust30_db
+  pdb70_ch = channel.fromPath(params.pdb70, checkIfExists:true)
+// pdb_ch = channel.fromPath(params.pdb_db, checkIfExists:true)
   /* vague outline of pipeline */
   /* protein_ch | jackhammer_uniref | jackhammer_mgnify | hhsearch | hhblist | alphafold */
 
   /* maybe closer to... */
-  uniprot_ch | combine(protein_ch) | jackhammer_uniref 
-  myg_cluster_ch | combine(protein_ch) | jackhammer_mgnify
-  pdb_ch | combine(/*something?*/) | hhblist
+  uniref_ch | combine(protein_ch) | jackhammer_uniref 
+  mgnify_ch | combine(protein_ch) | jackhammer_mgnify
+  pdb70_ch | combine(/*something?*/) | hhblist
 
-  | jackhammer_mgnify | hhsearch | hhblist | alphafold
+  jackhammer_mgnify.out | hhsearch | hhblist | alphafold
 }
 
 /* Scripts */
