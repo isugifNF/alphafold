@@ -11,6 +11,12 @@ nextflow run isugifNF/alphafold  -r main \
   -profile slurm -resume
 ```
 
+singularity image built from docker
+
+```
+
+```
+
 ## Background
 
 GitHub with instructions: https://github.com/deepmind/alphafold
@@ -28,6 +34,4 @@ Todos:
 * [ ] automagically link database
 * [ ] deconstruct python script
 * [ ] separate into cpu and gpu components
-
-
 
